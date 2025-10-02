@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DojoKet | Water Tank Dashboard</title>
+    
+    <!-- Chart.js for beautiful graphs -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <!-- Theme Toggle -->
+    <div class="theme-toggle">
+        <button id="themeSwitch" class="theme-btn">
+            <i class="fas fa-moon"></i>
+            <i class="fas fa-sun"></i>
+        </button>
+    </div>
+
+    <div class="dashboard-container">
+        <!-- Header -->
+        <header class="dashboard-header">
+            <div class="header-content">
+                <h1 class="logo">
+                    <i class="fas fa-tint"></i>
+                    DojoKet
+                </h1>
+                <div class="system-status">
+                    <div class="status-indicator online">
+                        <i class="fas fa-circle"></i>
+                        System Online
+                    </div>
+                    <div class="last-update" id="lastUpdate">
+                        Last update: Just now
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- Main Dashboard Grid -->
+        <main class="dashboard-main">
+            <!-- Left Column - Tank Visualization -->
+            <div class="column left-column">
+                <!-- Tank Widget -->
+                <div class="widget tank-widget">
+                    <div class="widget-header">
+                        <h2><i class="fas fa-water"></i> Water Tank</h2>
+                        <div class="pump-status" id="pumpStatusBadge">
+                            <span class="status-dot"></span>
+                            <span class="status-text">IDLE</span>
+                        </div>
+                    </div>
+                    
+                    <div class="tank-container">
+                        <div class="tank-graphic">
+                            <div class="tank-outline">
+                                <div class="tank-water" id="tankWater">
+                                    <div class="water-wave"></div>
+                                    <div class="water-wave wave-2"></div>
+                                </div>
+                                <div class="tank-measurements">
+                                    <span class="measurement">100%</span>
+                                    <span class="measurement">75%</span>
+                                    <span class="measurement">50%</span>
+                                    <span class="measurement">25%</span>
+                                    <span class="measurement">0%</span>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="tank-metrics">
+                            <div class="metric-main">
+                                <div class="metric-value" id="waterLevel">0%</div>
+                                <div class="metric-label">Current Level</div>
+                            </div>
+                            <div class="metric-secondary">
+                                <div class="metric-item">
+                                    <div class="metric-icon">
+                                        <i class="fas fa-ruler-vertical"></i>
+                                    </div>
+                                    <div class="metric-info">
+                                        <div class="metric-value-sm" id="distanceCm">0 cm</div>
+                                        <div class="metric-label-sm">Distance</div>
+                                    </div>
+                                </div>
+                                <div class="metric-item">
+                                    <div class="metric-icon">
+                                        <i class="fas fa-weight-hanging"></i>
+                                    </div>
+                                    <div class="metric-info">
+                                        <div class="metric-value-sm" id="currentVolume">0 L</div>
+                                        <div class="metric-label-sm">Volume</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Pump Control Widget -->
+                <div class="widget control-widget">
+                    <div class="widget-header">
+                        <h2><i class="fas fa-cogs"></i> Pump Control</h2>
+                    </div>
+                    <div class="control-content">
+                        <div class="control-stats">
+                            <div class="control-stat">
+                                <div class="stat-value" id="pumpRuntime">0s</div>
+                                <div class="stat-label">Total Runtime</div>
+                            </div>
+                            <div class="control-stat">
+                                <div class="stat-value" id="sessionDuration">0s</div>
+                                <div class="stat-label">Session</div>
+                            </div>
+                        </div>
+                        <div class="control-actions">
+                            <button class="btn btn-primary" id="manualStart">
+                                <i class="fas fa-play"></i>
+                                Manual Start
+                            </button>
+                            <button class="btn btn-danger" id="emergencyStop">
+                                <i class="fas fa-stop"></i>
+                                Emergency Stop
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Right Column - Analytics -->
+            <div class="column right-column">
+                <!-- Metrics Overview -->
+                <div class="widget metrics-widget">
+                    <div class="widget-header">
+                        <h2><i class="fas fa-chart-bar"></i> Live Metrics</h2>
+                    </div>
+                    <div class="metrics-grid">
+                        <div class="metric-card">
+                            <div class="metric-card-icon level">
+                                <i class="fas fa-chart-line"></i>
+                            </div>
+                            <div class="metric-card-content">
+                                <div class="metric-card-value" id="metricLevel">0%</div>
+                                <div class="metric-card-label">Water Level</div>
+                            </div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-card-icon volume">
+                                <i class="fas fa-weight-hanging"></i>
+                            </div>
+                            <div class="metric-card-content">
+                                <div class="metric-card-value" id="metricVolume">0L</div>
+                                <div class="metric-card-label">Current Volume</div>
+                            </div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-card-icon pump">
+                                <i class="fas fa-play-circle"></i>
+                            </div>
+                            <div class="metric-card-content">
+                                <div class="metric-card-value" id="metricPumpStatus">OFF</div>
+                                <div class="metric-card-label">Pump Status</div>
+                            </div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-card-icon time">
+                                <i class="fas fa-clock"></i>
+                            </div>
+                            <div class="metric-card-content">
+                                <div class="metric-card-value" id="metricRuntime">0s</div>
+                                <div class="metric-card-label">Pump Runtime</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- History Chart -->
+                <div class="widget chart-widget">
+                    <div class="widget-header">
+                        <h2><i class="fas fa-chart-area"></i> Level History</h2>
+                        <div class="chart-controls">
+                            <button class="chart-btn active" data-range="1h">1H</button>
+                            <button class="chart-btn" data-range="6h">6H</button>
+                            <button class="chart-btn" data-range="24h">24H</button>
+                        </div>
+                    </div>
+                    <div class="chart-container">
+                        <canvas id="levelChart"></canvas>
+                    </div>
+                </div>
+
+                <!-- System Stats -->
+                <div class="widget stats-widget">
+                    <div class="widget-header">
+                        <h2><i class="fas fa-info-circle"></i> System Information</h2>
+                    </div>
+                    <div class="stats-content">
+                        <div class="stat-item">
+                            <div class="stat-label">Max Level Today</div>
+                            <div class="stat-value" id="statMaxLevel">0%</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-label">Min Level Today</div>
+                            <div class="stat-value" id="statMinLevel">0%</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-label">Average Level</div>
+                            <div class="stat-value" id="statAvgLevel">0%</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-label">Data Points</div>
+                            <div class="stat-value" id="statDataPoints">0</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-spinner">
+            <div class="spinner"></div>
+            <p>Connecting to AquaFlow System...</p>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html>
